@@ -1112,6 +1112,14 @@ public final class NativeCrypto {
     public static native void SSL_set_session_creation_enabled(
             long sslNativePointer, boolean creationEnabled) throws SSLException;
 
+<<<<<<< HEAD
+=======
+    public static native boolean SSL_session_reused(long sslNativePointer);
+
+    public static native void SSL_set_reject_peer_renegotiations(
+            long sslNativePointer, boolean renegotiationRejected) throws SSLException;
+
+>>>>>>> 5af5e93... Use SSL_session_reused to check when a session was reused
     public static native void SSL_set_tlsext_host_name(long sslNativePointer, String hostname)
             throws SSLException;
     public static native String SSL_get_servername(long sslNativePointer);

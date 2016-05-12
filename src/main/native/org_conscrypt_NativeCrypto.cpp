@@ -7924,6 +7924,47 @@ static void NativeCrypto_SSL_set_session_creation_enabled(JNIEnv* env, jclass,
         return;
     }
     SSL_set_session_creation_enabled(ssl, creation_enabled);
+<<<<<<< HEAD
+=======
+#else
+    if (creation_enabled) {
+        SSL_clear_mode(ssl, SSL_MODE_NO_SESSION_CREATION);
+    } else {
+        SSL_set_mode(ssl, SSL_MODE_NO_SESSION_CREATION);
+    }
+#endif
+}
+
+static jboolean NativeCrypto_SSL_session_reused(JNIEnv* env, jclass, jlong ssl_address) {
+    SSL* ssl = to_SSL(env, ssl_address, true);
+    JNI_TRACE("ssl=%p NativeCrypto_SSL_session_reused", ssl);
+    if (ssl == nullptr) {
+        return JNI_FALSE;
+    }
+
+    int reused = SSL_session_reused(ssl);
+    JNI_TRACE("ssl=%p NativeCrypto_SSL_session_reused => %d", ssl, reused);
+    return reused == 1 ? JNI_TRUE : JNI_FALSE;
+}
+
+static void NativeCrypto_SSL_set_reject_peer_renegotiations(JNIEnv* env, jclass,
+        jlong ssl_address, jboolean reject_renegotiations)
+{
+    SSL* ssl = to_SSL(env, ssl_address, true);
+    JNI_TRACE("ssl=%p NativeCrypto_SSL_set_reject_peer_renegotiations reject_renegotiations=%d",
+              ssl, reject_renegotiations);
+    if (ssl == NULL) {
+        return;
+    }
+
+#if defined(OPENSSL_IS_BORINGSSL)
+    SSL_set_reject_peer_renegotiations(ssl, reject_renegotiations);
+#else
+    (void) reject_renegotiations;
+    /* OpenSSL doesn't support this call and accepts renegotiation requests by
+     * default. */
+#endif
+>>>>>>> 5af5e93... Use SSL_session_reused to check when a session was reused
 }
 
 static void NativeCrypto_SSL_set_tlsext_host_name(JNIEnv* env, jclass,
@@ -9770,6 +9811,11 @@ static JNINativeMethod sNativeCryptoMethods[] = {
     NATIVE_METHOD(NativeCrypto, SSL_set_verify, "(JI)V"),
     NATIVE_METHOD(NativeCrypto, SSL_set_session, "(JJ)V"),
     NATIVE_METHOD(NativeCrypto, SSL_set_session_creation_enabled, "(JZ)V"),
+<<<<<<< HEAD
+=======
+    NATIVE_METHOD(NativeCrypto, SSL_session_reused, "(J)Z"),
+    NATIVE_METHOD(NativeCrypto, SSL_set_reject_peer_renegotiations, "(JZ)V"),
+>>>>>>> 5af5e93... Use SSL_session_reused to check when a session was reused
     NATIVE_METHOD(NativeCrypto, SSL_set_tlsext_host_name, "(JLjava/lang/String;)V"),
     NATIVE_METHOD(NativeCrypto, SSL_get_servername, "(J)Ljava/lang/String;"),
     NATIVE_METHOD(NativeCrypto, SSL_do_handshake, "(J" FILE_DESCRIPTOR SSL_CALLBACKS "IZ[B[B)J"),
